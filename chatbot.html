@@ -12,19 +12,65 @@
     <script src="https://unpkg.com/supersimpledev/babel.js"></script>
     <script type="text/babel">
       function ChatInput() {
-        
+        return (
+          <>
+            <input placeholder="Send a message to Chatbot" size="30" />
+            <button>Send</button>
+          </>
+        );
       }
+      
+      function ChatMessage({ message, sender }) {
+        /*
+        Aqui temos a adição das props, as props em React, são um objeto especial que guardam propriedades passadas para as tags em questão, neste casso passamos o atributo "message" na tag "<ChatMessage>", que vem a ser um elemento html que criamos com o react, primeiro criamos a função que vai retornar o elemento, depois passamos o atributo, e o inserimos na mensagem usando 'props'
 
-      const div = (
+        Temos o exemplo abaixo, que usando um if statement, podemos modificar o elemento trocando a ordem 'mensagem-imagem' do chat que estamos criando, acessamos a prop 'sender' passada na declaração da tag, conferimos o sender e de acordo com a resposta o código é executado
+        */
+        /*
+        const message = props.message;
+        const sender = props.sender;
+        
+        aplicado destructuring abaixo
+        */
+        // const {message, sender} = props
 
-        <div>
-          <button>hello</button>
-          <p>paragraph of text {2 + 2}</p>
-        </div>
+        /*
+        código alterado para operador de guarda abaixo, operador '&&'
+        if(sender === "robot") {
+          return (
+            <div>
+              <img src="robot.png" width="50"/>
+              {message}
+          </div>  
+          )
+        }
+        */
+        /*Essa função usava um fragmento como a função ChatInput, porém o fragmento tem como base display inline, já a div tem display block e ocupa a linha inteira, então em React é muito usado o elemento "div" por questão de layout e espaçamento entre componentes*/
+        
+        return (
+          <div>
+            {sender === 'robot' && <img src="robot.png" width="50"/> }
+            {message}
+            {sender === 'user' && <img src="user.png" width="50"/> }
+          </div>
+        );
+      };
+
+      const app = (
+        <>
+      {/* {ChatInput()} 
+        A sintaxe acima tem a mesma função que a sintaxe abaixo, porém a de baixo é mais próxima do HTML comum e pode ser mais legível, como por exemplo quando não temos nada incluso entre as tags de abertura e fechamento podemos utilizar apenas a de fechamento no esquema demonstrado <MyFunction />, é apenas um shortcut e lembrando que não pode ter nada entre as tags.
+        */} 
+          <ChatInput />
+          <ChatMessage sender="user" message="hello chatbot" />
+          <ChatMessage sender="robot" message="Hello! How can i help you?" />
+          <ChatMessage sender="user" message="can you get me todays date?" />
+          <ChatMessage sender="robot" message="Today is January 9th" />
+        </>
       );
 
       const container = document.querySelector('.js-container');
-      ReactDOM.createRoot(container).render(div);
+      ReactDOM.createRoot(container).render(app);
     </script>
   </body>
 </html>
