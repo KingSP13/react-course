@@ -9,16 +9,56 @@
     <script src="https://unpkg.com/supersimpledev/react.js"></script>
     <script src="https://unpkg.com/supersimpledev/react-dom.js"></script>
 
+    <script src="https://unpkg.com/supersimpledev/chatbot.js"></script>
+
     <script src="https://unpkg.com/supersimpledev/babel.js"></script>
     <script type="text/babel">
-      function ChatInput() {
+      function ChatInput({chatMessages, setChatMessages}) {
+          // Aqui usamos o useState novamente, que é um array com 2 elementos, sendo o primeiro o dado atual, e o segundo a função que transforma esse dado, e por convenção o nome da 'updater function' comeca com 'set'
+          const [inputText, setInputText] = React.useState('');
+
+        function saveInputText(event) {
+          // O Objeto 'event' armazena informações sobre o evento em questão, sendo um objeto ele também possui métodos, como estamos usando o eventHandler 'onChange', ele é acionado toda vez que o campo de texto do input é alterado, podemos assisti-lo pelo console.log
+          setInputText(event.target.value);
+        }
+
+        // Essencialmente, o 'State' não atualiza a página imediatamente, ele atualiza quando o código é executado por completo, como logo em seguida desse state temos a mensagem do robo, isso não vai ser executado com nossa menssagem inicial, a mensagem do robo acaba assumindo o lugar antes da renderização e essencialmente perdemos nossa mensagem, por isso armazenamos numa variável a nossa alteração, depois entra o passo do robo, que vai receber o array de mensagens atualizado e adicionar a própria, é necessário quebrar este processo em 'fases' para funcionar corretamente.
+        function sendMessage() {
+          const newChatMessages = [
+            ...chatMessages, 
+            {
+              message: inputText,
+              sender: 'user',
+              id: crypto.randomUUID()
+            }
+          ]
+
+          setChatMessages(newChatMessages);
+
+
+            const response = Chatbot.getResponse(inputText);
+            setChatMessages([
+            ...newChatMessages, 
+            {
+              message: response,
+              sender: 'robot',
+              id: crypto.randomUUID()
+            }
+          ]);
+          setInputText('')
+        }
+
         return (
           <>
             <input 
               placeholder="Send a message to Chatbot" 
               size="30" 
+              onChange = {saveInputText}
+              value={inputText}
             />
-            <button>Send</button>
+            <button
+              onClick = {sendMessage}
+            >Send</button>
           </>
         );
       }
@@ -39,19 +79,27 @@
         );
       };
 
-      /*
-      O React pede que cada elemento de um array tenha uma propriedade 'key' com valor Unique, neste caso adicionamos manualmente os ids para fim de exemplificar, caso contrário ele apresenta um erro no console.
-      Também criamos um array de objetos para agrupar as mensagens, objetos compostos por tres propriedades, sendo elas a mensagem e seu conteúdo, o sender que é quem a enviou, e a propriedade 'key' solicitada pelo React para acompanhar as mudanças no array
-      */
-      function ChatMessages() {
-        /*
-        Componente criado para segurar o Array que vai agrupar todas as mensagens do chatbot
-        */
+      function ChatMessages({ chatMessages }) {
 
-        /*
-        Se conferirmos no código anterior, usávamos o array de objetos contendo as mensagens como uma variável comum, porém quando atualizarmos essa variável comum, o HTML não vai ser atualizado, por isso precisamos converte-lo para 'state', o state é o que conecta os dados ao HTML, como mostrado abaixo, é um método nativo do React, que retorna um array, por isso nomeamos a variáve que vai armazená-lo como 'array'
-        */
-        const array = React.useState([{
+        return (
+          <>
+          {chatMessages.map((chatMessage) => {
+                return (
+                  <ChatMessage
+                    message = {chatMessage.message}
+                    sender = {chatMessage.sender}
+                    key = {chatMessage.id}
+                  />
+                );
+          })}
+          </>
+        )
+      }
+      function App() {
+
+        //Aplicado desructuring de arrays aqui também, primeiro nas duas variáveis abaixo, onde elas estão entre colchetes, aqui usamos as variáveis direto em useState sem precisarmos armazená-las numa variável a parte.
+
+        const [chatMessages, setChatMessages] = React.useState([{
           message: 'hello chatbot',
           sender: 'user',
           id: 'id1'
@@ -68,51 +116,25 @@
           sender: 'robot',
           id: 'id4'
         }]);
-        const chatMessages = array[0]; //o método nativo .useState acima, retorna dois valores, sendo o primeiro, o valor atual do array não processado.
-        const setChatMessages = array[1]; // O segundo valor, é a função que atualiza e modifica os dados, também conhecida como 'updater function'. Por convenção, caso precise armazená-la, o nome inicia com 'set'.
+        
+        // Array destructuring, atalhos para destructuring de arrays, mesmo princípio que para com objetos, lembrando que A ORDEM IMPORTA.
 
-        function sendMessage() {
-          // Abaixo temos a 'Updater function', que substitui todo o array inicial com o novo depois de processado. 
-          setChatMessages([
-            ...chatMessages, // (...) é uma função JavaScript, que recebe um dado array e o copia para um novo Array, é chamado de Spread Operator
-            {
-              message: 'test',
-              sender: 'user',
-              id: crypto.randomUUID()
-            }
-          ]);
-          /*
-          Aqui atualizamos os dados manualmente inserindo direto no código o que queremos, e no React usamos a updater function, por que ela informa ao React que os dados foram atualizados e ele atualiza o HTML. NÃo ATUALIZAR OS DADOS DIRETAMENTE, SEMPRE GERAR UMA CÓPIA DOS DADOS, E ALTERAR ESTA CÓPIA. Importante para boas práticas e eficiência.
-          chatMessages.push({
-            message: 'test',
-            sender: 'user',
-            id: crypto.randomUUID()
-          });
-          */
-          console.log(chatMessages)
-        }
+        // const [chatMessages, setChatMessages] = array;
+        /*
+        const chatMessages = array[0]; 
+        const setChatMessages = array[1]; 
+        */
+
 
         return (
           <>
-          <button onClick = {sendMessage}>Send Message</button>
-
-          {chatMessages.map((chatMessage) => {
-                return (
-                  <ChatMessage
-                    message = {chatMessage.message}
-                    sender = {chatMessage.sender}
-                    key = {chatMessage.id}
-                  />
-                );
-          })}
-          </>
-        )
-      }
-      function App() {
-        return (
-          <>
-            <ChatInput />
-            <ChatMessages />
+            <ChatInput 
+            chatMessages={chatMessages}
+            setChatMessages={setChatMessages}
+            />
+            <ChatMessages 
+            chatMessages={chatMessages}
+            />
           </>
         );
       }
