@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Exercices - State</title>
+  </head>
+  <body>
+    <script src="https://unpkg.com/supersimpledev/react.js"></script>
+    <script src="https://unpkg.com/supersimpledev/react-dom.js"></script>
+    
+    <script src="https://unpkg.com/supersimpledev/babel.js"></script>
+    <script type="text/babel">
+      
+      function App() {
+        let [counter, setCounter] = React.useState(0)
+        
+        function addCount() {
+          setCounter(counter ++);
+        }
+        return (
+          <>
+          <p>
+            Click counter.
+          </p>
+          <button
+          onClick={addCount}
+          >Clicked {counter} times</button>
+          </>
+        )
+      }
+
+      const container = document.querySelector('.js-container');
+      ReactDOM.createRoot(container).render(<App />);
+    </script>
+
+    <div class="js-container"></div>
+
+  </body>
+</html>
