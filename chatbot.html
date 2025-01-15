@@ -68,9 +68,8 @@
           sender: 'robot',
           id: 'id4'
         }]);
-        const chatMessages = array[0]; //o método nativo .useState acima, retorna tres valores, sendo o primeiro, o valor atual do array não processado.
+        const chatMessages = array[0]; //o método nativo .useState acima, retorna dois valores, sendo o primeiro, o valor atual do array não processado.
         const setChatMessages = array[1]; // O segundo valor, é a função que atualiza e modifica os dados, também conhecida como 'updater function'. Por convenção, caso precise armazená-la, o nome inicia com 'set'.
-         // O terceiro é o novo valor já processado pela dada função
 
         function sendMessage() {
           // Abaixo temos a 'Updater function', que substitui todo o array inicial com o novo depois de processado. 
