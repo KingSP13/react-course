@@ -9,12 +9,13 @@
     
     <script src="https://unpkg.com/supersimpledev/babel.js"></script>
     <script type="text/babel">
-      
+
       function App() {
         let [counter, setCounter] = React.useState(0)
-        
+        const clicked = counter === 1 ? 'time' : 'times'
+
         function addCount() {
-          setCounter(counter ++);
+          setCounter(counter + 1);
         }
         return (
           <>
@@ -23,7 +24,7 @@
           </p>
           <button
           onClick={addCount}
-          >Clicked {counter} times</button>
+          >Clicked {counter} {clicked}</button>
           </>
         )
       }
